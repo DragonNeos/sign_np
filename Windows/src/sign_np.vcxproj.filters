@@ -1,0 +1,109 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav</Extensions>
+    </Filter>
+    <Filter Include="Source Files\libkirk">
+      <UniqueIdentifier>{911ec3c5-14c9-4e7d-865d-5f830975e7bf}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="libkirk\aes.c">
+      <Filter>Source Files\libkirk</Filter>
+    </ClCompile>
+    <ClCompile Include="libkirk\amctrl.c">
+      <Filter>Source Files\libkirk</Filter>
+    </ClCompile>
+    <ClCompile Include="libkirk\bn.c">
+      <Filter>Source Files\libkirk</Filter>
+    </ClCompile>
+    <ClCompile Include="libkirk\ec.c">
+      <Filter>Source Files\libkirk</Filter>
+    </ClCompile>
+    <ClCompile Include="libkirk\kirk_engine.c">
+      <Filter>Source Files\libkirk</Filter>
+    </ClCompile>
+    <ClCompile Include="libkirk\sha1.c">
+      <Filter>Source Files\libkirk</Filter>
+    </ClCompile>
+    <ClCompile Include="eboot.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="getopt.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="isoreader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pgd.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="sign_np.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tlzrc.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="utils.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="libkirk\aes.h">
+      <Filter>Source Files\libkirk</Filter>
+    </ClInclude>
+    <ClInclude Include="libkirk\amctrl.h">
+      <Filter>Source Files\libkirk</Filter>
+    </ClInclude>
+    <ClInclude Include="libkirk\key_vault.h">
+      <Filter>Source Files\libkirk</Filter>
+    </ClInclude>
+    <ClInclude Include="libkirk\kirk_engine.h">
+      <Filter>Source Files\libkirk</Filter>
+    </ClInclude>
+    <ClInclude Include="libkirk\psp_headers.h">
+      <Filter>Source Files\libkirk</Filter>
+    </ClInclude>
+    <ClInclude Include="libkirk\sha1.h">
+      <Filter>Source Files\libkirk</Filter>
+    </ClInclude>
+    <ClInclude Include="eboot.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="getopt.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="isoreader.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pgd.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sign_np.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="tlzrc.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="unistd.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="utils.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="sign_np.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+</Project>
