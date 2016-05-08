@@ -478,10 +478,10 @@ int write_pbp(FILE *f, char *iso_name, char *content_id, int np_flags, u8 *start
 
 void print_usage()
 {
-	printf("***********************************************************\n\n");
-	printf("sign_np v1.0.2 - Convert PSP ISOs to signed PSN PBPs.\n");
+	printf("************************************************************\n\n");
+	printf("sign_np v1.0.4 - Convert PSP ISOs to signed PSN PBPs.\n");
 	printf("               - Written by Hykem (C).\n\n");
-	printf("***********************************************************\n\n");
+	printf("************************************************************\n\n");
 	printf("Usage: sign_np -pbp [-c] <input> <output> <cid> <key>\n");
 	printf("                    <startdat> <opnssmp>\n");
 	printf("       sign_np -elf <input> <output> <tag>\n");
@@ -502,18 +502,20 @@ void print_usage()
 	printf("- ELF mode:\n");
 	printf("<input>: A valid ELF file\n");
 	printf("<output>: Resulting signed EBOOT.BIN file\n");
-	printf("<tag>: 0 - EBOOT tag 0xD91609F0\n");
-	printf("       1 - EBOOT tag 0xD9160AF0\n");
-	printf("       2 - EBOOT tag 0xD9160BF0\n");
-	printf("       3 - EBOOT tag 0xD91611F0\n");
-	printf("       4 - EBOOT tag 0xD91612F0\n");
-	printf("       5 - EBOOT tag 0xD91613F0\n");
-	printf("       6 - EBOOT tag 0xD91614F0\n");
-	printf("       7 - EBOOT tag 0xD91615F0\n");
-	printf("       8 - EBOOT tag 0xD91624F0\n");
-	printf("       9 - EBOOT tag 0xD91628F0\n");
-	printf("       10 - EBOOT tag 0xD91680F0\n");
-	printf("       11 - EBOOT tag 0xD91681F0\n");
+	printf("<tag>: 00 - EBOOT tag 0x8004FD03  14 - EBOOT tag 0xD91617F0\n");
+    printf("       01 - EBOOT tag 0xD91605F0  15 - EBOOT tag 0xD91618F0\n");
+    printf("       02 - EBOOT tag 0xD91606F0  16 - EBOOT tag 0xD91619F0\n");
+    printf("       03 - EBOOT tag 0xD91608F0  17 - EBOOT tag 0xD9161AF0\n");
+    printf("       04 - EBOOT tag 0xD91609F0  18 - EBOOT tag 0xD9161EF0\n");
+    printf("       05 - EBOOT tag 0xD9160AF0  19 - EBOOT tag 0xD91620F0\n");
+    printf("       06 - EBOOT tag 0xD9160BF0  20 - EBOOT tag 0xD91621F0\n");
+    printf("       07 - EBOOT tag 0xD91610F0  21 - EBOOT tag 0xD91622F0\n");
+    printf("       08 - EBOOT tag 0xD91611F0  22 - EBOOT tag 0xD91623F0\n");
+    printf("       09 - EBOOT tag 0xD91612F0  23 - EBOOT tag 0xD91624F0\n");
+    printf("       10 - EBOOT tag 0xD91613F0  24 - EBOOT tag 0xD91628F0\n");
+    printf("       11 - EBOOT tag 0xD91614F0  25 - EBOOT tag 0xD91680F0\n");
+    printf("       12 - EBOOT tag 0xD91615F0  26 - EBOOT tag 0xD91681F0\n");
+    printf("       13 - EBOOT tag 0xD91616F0  27 - EBOOT tag 0xD91690F0\n");
 }
 
 int main(int argc, char *argv[])
@@ -559,7 +561,7 @@ int main(int argc, char *argv[])
 		}
 		
 		// Check tag.
-		if ((tag < 0) || (tag > 11))
+		if ((tag < 0) || (tag > 27))
 		{
 			printf("ERROR: Invalid EBOOT tag!\n");
 			fclose(elf);
@@ -684,6 +686,23 @@ int main(int argc, char *argv[])
 		printf("Initializing KIRK engine...\n\n");
 		kirk_init();
 		
+		// Set keys' context.
+		MAC_KEY mkey;
+		CIPHER_KEY ckey;
+			
+		// Set flags and block size data.
+		int np_flags = (use_version_key) ? 0x2 : (0x3 | (0x01000000));
+		int block_basis = 0x10;
+		int block_size = block_basis * 2048;
+		long long iso_blocks = (iso_size + block_size - 1) / block_size;
+		
+		// Generate random header key.
+		sceUtilsBufferCopyWithRange(header_key, 0x10, 0, 0, KIRK_CMD_PRNG);
+		
+		// Generate fixed key, if necessary.
+		if (!use_version_key)
+			sceNpDrmGetFixedKey(version_key, content_id, np_flags);
+		
 		// Check for optional files.
 		char *startdat_name = NULL;
 		char *opnssmp_name = NULL;
@@ -782,11 +801,6 @@ int main(int argc, char *argv[])
 			fseek(opnssmp, 0, SEEK_END);
 			int opnssmp_size = ftell(opnssmp);
 			fseek(opnssmp, 0, SEEK_SET);
-		
-			// Generate random PGD key.
-			u8 pgd_key[0x10];
-			memset(pgd_key, 0, 0x10);
-			sceUtilsBufferCopyWithRange(pgd_key, 0x10, 0, 0, KIRK_CMD_PRNG);
 			
 			// Prepare PGD buffers.
 			int pgd_block_size = 2048;
@@ -797,8 +811,8 @@ int main(int argc, char *argv[])
 			u8 *opnssmp_buf = (u8 *) malloc (opnssmp_size);
 			fread(opnssmp_buf, opnssmp_size, 1, opnssmp);
 		
-			// Encrypt OPNSSMP file.
-			pgd_size = encrypt_pgd(opnssmp_buf, opnssmp_size, pgd_block_size, 1, 1, 2, pgd_key, pgd_buf);
+			// Encrypt OPNSSMP file with version_key.
+			pgd_size = encrypt_pgd(opnssmp_buf, opnssmp_size, pgd_block_size, 1, 1, 2, version_key, pgd_buf);
 			
 			// Clean up.
 			fclose(opnssmp);
@@ -864,23 +878,6 @@ int main(int argc, char *argv[])
 			fclose(png);
 		}
 		
-		// Set keys' context.
-		MAC_KEY mkey;
-		CIPHER_KEY ckey;
-			
-		// Set flags and block size data.
-		int np_flags = (use_version_key) ? 0x2 : (0x3 | (0x01000000));
-		int block_basis = 0x10;
-		int block_size = block_basis * 2048;
-		long long iso_blocks = (iso_size + block_size - 1) / block_size;
-		
-		// Generate random header key.
-		sceUtilsBufferCopyWithRange(header_key, 0x10, 0, 0, KIRK_CMD_PRNG);
-		
-		// Generate fixed key, if necessary.
-		if (!use_version_key)
-			sceNpDrmGetFixedKey(version_key, content_id, np_flags);
-		
 		// Write PBP data.
 		printf("Writing PBP data...\n");
 		long long table_offset = write_pbp(pbp, iso_name, content_id, np_flags, startdat_buf, startdat_size, pgd_buf, pgd_size);
@@ -889,15 +886,15 @@ int main(int argc, char *argv[])
 		int np_size = 0x100;
 		
 		// Write NPUMDIMG table.
-		printf("NPUMDIMG table size: %I64d\n", table_size);
+		printf("NPUMDIMG table size: %"INT64_FORMAT"d\n", table_size);
 		printf("Writing NPUMDIMG table...\n\n");
 		u8 *table_buf = malloc(table_size);
 		memset(table_buf, 0, table_size);
 		fwrite(table_buf, table_size, 1, pbp);
 		
 		// Write ISO blocks.
-		printf("ISO size: %I64d\n", iso_size);
-		printf("ISO blocks: %I64d\n", iso_blocks);
+		printf("ISO size: %"INT64_FORMAT"d\n", iso_size);
+		printf("ISO blocks: %"INT64_FORMAT"d\n", iso_blocks);
 		long long iso_offset = 0x100 + table_size;
 		u8 *iso_buf = malloc(block_size * 2);
 		u8 *lzrc_buf = malloc(block_size * 2);
@@ -966,7 +963,7 @@ int main(int argc, char *argv[])
 
 			// Update offset.
 			iso_offset += wsize;
-			printf("\rWriting ISO blocks: %02I64d%%", i * 100 / iso_blocks);
+			printf("\rWriting ISO blocks: %02"INT64_FORMAT"d%%", i * 100 / iso_blocks);
 		}
 		printf("\rWriting ISO blocks: 100%%\n\n");
 		

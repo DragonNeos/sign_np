@@ -14,6 +14,14 @@
 #include "tlzrc.h"
 #include "utils.h"
 
+#ifdef __MINGW32__ 
+#define INT64_FORMAT "I64"
+#else 
+#define INT64_FORMAT "ll"
+#define fseeko64 fseeko
+#define ftello64 ftello
+#endif 
+
 #define RATIO_LIMIT 90
 #define PSF_MAGIC 0x46535000
 
